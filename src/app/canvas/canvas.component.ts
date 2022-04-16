@@ -1,14 +1,8 @@
-import {
-  Component,
-  OnInit,
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as chroma from 'chroma-js';
 import { fabric } from 'fabric';
 import { ColorService } from '../services/color/color.service';
-import {
-  brushModes,
-  FabricService,
-} from '../services/fabric/fabric.service';
+import { brushModes, FabricService } from '../services/fabric/fabric.service';
 
 @Component({
   selector: 'app-canvas',
@@ -18,11 +12,11 @@ import {
 export class CanvasComponent implements OnInit {
   protected canvas!: fabric.Canvas;
   protected brushSizeButtons: BrushSizeButton[] = [
-    { width: 1, disabled: true },
-    { width: 5, disabled: false },
+    { width: 1, disabled: false },
+    { width: 5, disabled: true },
     { width: 15, disabled: false },
   ];
-  public colorPalette: string[] = []
+  public colorPalette: string[] = [];
 
   constructor(
     private fabricService: FabricService,
@@ -39,22 +33,25 @@ export class CanvasComponent implements OnInit {
       stopContextMenu: true,
     });
 
+    this.initializeFabricService();
+    this.colorPalette = this.colorService.randomPalette();
+  }
+
+  initializeFabricService(): void {
     this.fabricService.canvas = this.canvas;
-    this.fabricService.brushMode = brushModes.DRAW;
-    this.fabricService.brushColor = chroma.random().hex();
+    this.fabricService.initializeBrushToDefaults();
+    this.bindFabricServiceMouseEvents();
+  }
+
+  bindFabricServiceMouseEvents(): void {
     this.canvas.on('mouse:up', (event: fabric.IEvent<MouseEvent>) => {
       this.fabricService.onMouseUp(event);
     });
-    this.colorPalette = this.colorService.randomPalette();
   }
 
   setBrushSize(width: number): void {
     this.selectBrushSizeButton(width);
     this.fabricService.brushWidth = width;
-  }
-
-  setBrushColor(color: string) {
-    this.fabricService.brushColor = color;
   }
 
   selectBrushSizeButton(width: number): void {
@@ -79,17 +76,24 @@ export class CanvasComponent implements OnInit {
     return button ? button.disabled : false;
   }
 
+  setBrushColor(color: string) {
+    if (this.fabricService.brushMode === brushModes.MARKER) {
+      color = this.colorService.setColorHexAlpha(color, 0.5);
+    } else {
+      color = this.colorService.setColorHexAlpha(color, 1.0);
+    }
+    this.fabricService.brushColor = color;
+  }
+
   toggleDrawMode(): void {
     if (this.fabricService.brushMode === brushModes.DRAW) {
       this.fabricService.brushMode = brushModes.MARKER;
-      this.fabricService.brushColor = chroma.random().alpha(0.5).css();
       this.fabricService.brushWidth = 20;
     } else {
       this.fabricService.brushMode = brushModes.DRAW;
-      this.fabricService.brushColor = chroma(this.fabricService.brushColor)
-        .alpha(1)
-        .hex();
+      this.setBrushSize(5);
     }
+    this.setBrushColor(this.fabricService.brushColor);
   }
 }
 

@@ -6,31 +6,36 @@
   id="fabricCanvas"
 >
 </canvas>
-<div #brushSizeButtons style="display: flex; flex-direction: row;">
-    <span *ngFor="let width of getValidBrushSizesInPixels()">
+<div #brushSizeButtons style="display: flex; flex-direction: row">
+  <span *ngFor="let width of getValidBrushSizesInPixels()">
     <button
-        #button
-        (click)="setBrushSize(width)"
-        [attr.brushWidth]="width"
-        [disabled]="isBrushSizeButtonDisabled(width)"
-        style="
+      #button
+      (click)="setBrushSize(width)"
+      [attr.brushWidth]="width"
+      [disabled]="isBrushSizeButtonDisabled(width)"
+      style="
         width: 25px;
         height: 25px;
         display: flex;
         justify-content: center;
         align-content: center;
-        "
+      "
     >
-        <i
-        class="bi bi-circle-fill"
-        [style.font-size.px]="width"
+      <i
+        class="bi bi-circle-fill bi-override-center"
+        [style.font-size.px]="width * 2 > 15 ? 15 : width * 2"
         style="align-self: center"
-        >
-        </i>
+      >
+      </i>
     </button>
-    </span>
+  </span>
 </div>
 <button (click)="toggleDrawMode()">Toggle</button>
 <div>
-    <div *ngFor="let color of colorPalette" style="width: 32px; height: 32px; display: inline-block;" [ngStyle]="{backgroundColor: color}" (click)="setBrushColor(color)"></div>
+  <div
+    *ngFor="let color of colorPalette"
+    style="width: 32px; height: 32px; display: inline-block"
+    [ngStyle]="{ backgroundColor: color }"
+    (click)="setBrushColor(color)"
+  ></div>
 </div>

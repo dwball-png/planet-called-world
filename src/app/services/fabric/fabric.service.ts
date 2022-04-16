@@ -3,9 +3,10 @@ import * as chroma from 'chroma-js';
 import { fabric } from 'fabric';
 
 export const brushDefaults = {
+  mode: brushModes.DRAW,
   color: '#000',
-  width: 1,
-}
+  width: 5,
+};
 
 export const enum brushModes {
   DRAW = 'draw',
@@ -17,18 +18,17 @@ export const enum brushModes {
 const enum eventButtons {
   LEFT = 1,
   RIGHT = 3,
-  MIDDLE = 2, 
+  MIDDLE = 2,
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FabricService {
   private canvasRef!: fabric.Canvas;
   private drawMode: string = brushModes.DRAW;
 
-  constructor() {
-  }
+  constructor() {}
 
   public set canvas(surface: fabric.Canvas) {
     if (surface) {
@@ -60,6 +60,12 @@ export class FabricService {
     return this.drawMode as brushModes;
   }
 
+  public initializeBrushToDefaults(): void {
+    this.brushColor = brushDefaults.color;
+    this.brushMode = brushDefaults.mode;
+    this.brushWidth = brushDefaults.width;
+  }
+
   public onMouseUp(event: fabric.IEvent<MouseEvent>): void {
     if (event.button === eventButtons.RIGHT) {
       if ((this.canvasRef as any)._isCurrentlyDrawing) {
@@ -73,9 +79,9 @@ export class FabricService {
       }
       if (this.drawMode === brushModes.MARKER) {
         if (event.currentTarget != null) {
-          console.log(this.canvasRef.freeDrawingBrush);
+          // console.log(this.canvasRef.freeDrawingBrush);
           event.currentTarget.sendToBack();
-          event.currentTarget.stroke = chroma(this.brushColor).alpha(1).brighten().hex();
+          event.currentTarget.stroke = chroma(this.brushColor).alpha(1).hex();
         }
       }
     }
