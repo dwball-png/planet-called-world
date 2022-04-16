@@ -1,7 +1,36 @@
 <p>Canvas Component</p>
 <canvas
-    width="600"
-    height="600"
-    style="border: 1px solid #cccccc"
-    id="fabricCanvas">
+  width="600"
+  height="600"
+  style="border: 1px solid #cccccc"
+  id="fabricCanvas"
+>
 </canvas>
+<div #brushSizeButtons style="display: flex; flex-direction: row;">
+    <span *ngFor="let width of getValidBrushSizesInPixels()">
+    <button
+        #button
+        (click)="setBrushSize(width)"
+        [attr.brushWidth]="width"
+        [disabled]="isBrushSizeButtonDisabled(width)"
+        style="
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        "
+    >
+        <i
+        class="bi bi-circle-fill"
+        [style.font-size.px]="width"
+        style="align-self: center"
+        >
+        </i>
+    </button>
+    </span>
+</div>
+<button (click)="toggleDrawMode()">Toggle</button>
+<div>
+    <div *ngFor="let color of colorPalette" style="width: 32px; height: 32px; display: inline-block;" [ngStyle]="{backgroundColor: color}" (click)="setBrushColor(color)"></div>
+</div>
